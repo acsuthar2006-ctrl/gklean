@@ -14,7 +14,6 @@ def status():
     print(f"Error: {e}")
 
  
-
 def save(name: str = typer.Argument(default=".")):
   """Stage files for commit. Defaults to all files ('.')."""
   # to run this command write :
@@ -32,6 +31,19 @@ def save(name: str = typer.Argument(default=".")):
   except Exception as e:
     print(f"Error: {e}")
 
+
+def commit(message: str):
+  """Commit the staged files."""
+  # to run this command write :
+  #     gklean commit "message"
+  try:
+    repo = git.Repo(search_parent_directories=True)
+    repo.git.commit("-m", message)
+    print(f"Committed: {message}")
+  except git.InvalidGitRepositoryError:
+    print("Error: Not a git repository.")
+  except Exception as e:
+    print(f"Error: {e}")
 
 
 def rename(new_name: str):
