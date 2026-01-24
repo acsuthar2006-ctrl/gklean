@@ -46,6 +46,23 @@ def commit(message: str):
     print(f"Error: {e}")
 
 
+def history(n: int = typer.Argument(default=10), oneline: bool = False):
+  """Show the git history of the current repository."""
+  # to run this command write :
+  #     gklean history
+  #     gklean history --oneline
+  try:
+    repo = git.Repo(search_parent_directories=True)
+    args = ["-n", str(n)]
+    if oneline:
+      args.append("--oneline")
+    print(repo.git.log(*args))
+  except git.InvalidGitRepositoryError:
+    print("Error: Not a git repository.")
+  except Exception as e:
+    print(f"Error: {e}")
+
+
 def rename(new_name: str):
   """Rename the CLI command (modifies pyproject.toml). requires reinstall."""
   import re

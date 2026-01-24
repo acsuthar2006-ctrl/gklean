@@ -53,3 +53,17 @@ If you make changes to your code, you need to reinstall it for the global comman
 
 - For **pipx**: `pipx reinstall gklean` (or your custom name)
 - For **pip**: `pip install .` again
+
+## Troubleshooting
+
+If you see `command not found: pip`, try using `pip3` instead:
+
+```bash
+pip3 install .
+```
+
+Or use Python directly:
+
+```bash
+python3 -m pip install .
+```
