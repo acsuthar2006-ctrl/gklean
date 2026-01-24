@@ -123,6 +123,34 @@ def ignore(filename: str):
   except Exception as e:
     print(f"Error: {e}")
 
+def unignore(filename: str):
+  """Remove a file from .gitignore."""
+  # to run this command write :
+  #     gklean unignore secret.env
+  from pathlib import Path
+  try:
+    repo = git.Repo(search_parent_directories=True)
+    root = Path(repo.working_dir)
+    gitignore = root / ".gitignore"
+    
+    if not gitignore.exists():
+      print("Error: .gitignore does not exist.")
+      return
+      
+    content = gitignore.read_text().splitlines()
+    if filename not in content:
+      print(f"{filename} is not in .gitignore.")
+      return
+      
+    new_content = [line for line in content if line.strip() != filename]
+    gitignore.write_text("\n".join(new_content) + "\n")
+      
+    print(f"Removed {filename} from .gitignore")
+  except git.InvalidGitRepositoryError:
+    print("Error: Not a git repository.")
+  except Exception as e:
+    print(f"Error: {e}")
+
 def rename(new_name: str):
   """Rename the CLI command (modifies pyproject.toml). requires reinstall."""
   import re

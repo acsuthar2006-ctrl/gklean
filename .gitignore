@@ -36,3 +36,5 @@ MANIFEST
 .idea/
 
 secret.env
+
+secerts.env
