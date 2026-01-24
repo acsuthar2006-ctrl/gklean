@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gklean"
+version = "0.1.0"
+description = "A CLI tool for git cleanup"
+dependencies = [
+    "typer",
+    "gitpython"
+]
+
+[project.scripts]
+gklean = "gklean.main:app"
