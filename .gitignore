@@ -35,6 +35,4 @@ MANIFEST
 .vscode/
 .idea/
 
-secret.env
 
-secerts.env
