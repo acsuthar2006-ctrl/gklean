@@ -34,3 +34,5 @@ MANIFEST
 # Editors
 .vscode/
 .idea/
+
+secret.env
