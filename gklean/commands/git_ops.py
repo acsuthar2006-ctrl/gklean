@@ -44,7 +44,7 @@ def commit(message: str):
   except Exception as e:
     print(f"Error: {e}")
 
-def history(n: int = typer.Argument(default=10), file: str = typer.Option(None, "--file", "-f"), oneline: bool = typer.Option(False, "--oneline", "-o")):
+def history(n: int = typer.Argument(default=10), file: str = typer.Option(None, "--file", "-f"), oneline: bool = typer.Option(False, "--oneline", "-ol")):
   """Show the git history of the current repository."""
   # to run this command write :
   #     gklean history
