@@ -67,5 +67,21 @@ def switch_branch(name: str):
 
     except git.InvalidGitRepositoryError:
         console.print("[bold red]Error: Not a git repository.[/bold red]")
+
+def list_branches():
+    """List all branches """
+    try:
+        repo = git.Repo(search_parent_directories=True)
+        current = repo.active_branch.name
+        
+        console.print("[bold]Branches:[/bold]")
+        for head in repo.heads:
+            if head.name == current:
+                console.print(f"  [bold green]* {head.name}[/bold green] (active)")
+            else:
+                console.print(f"    {head.name}")
+
+    except git.InvalidGitRepositoryError:
+        console.print("[bold red]Error: Not a git repository.[/bold red]")
     except Exception as e:
-        console.print(f"[bold red]Error switching branch: {e}[/bold red]")
+        console.print(f"[bold red]Error listing branches: {e}[/bold red]")
