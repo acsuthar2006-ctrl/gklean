@@ -104,11 +104,11 @@ def sync():
     
     if stashed:
       print(" Popping stash...")
-    try:
+      try:
         repo.git.stash("pop")
-    except git.GitCommandError:
-      print("⚠️  Conflict during stash pop. Please resolve conflicts manually.")
-      return
+      except git.GitCommandError:
+        print("⚠️  Conflict during stash pop. Please resolve conflicts manually.")
+        return
 
     print(" Pushing changes...")
     repo.git.push()
