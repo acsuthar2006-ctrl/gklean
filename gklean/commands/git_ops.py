@@ -8,6 +8,27 @@ from rich.panel import Panel
 
 console = Console()
 
+
+def init(directory: str = typer.Argument(".", help="Directory to initialize (default: current)")):
+  """Initialize a new git repository 🐣"""
+  # to run this command write:
+  #     gklean init
+  try:
+    # Check if already a repo
+    try:
+      _ = git.Repo(directory, search_parent_directories=False)
+      console.print(f"[yellow]⚠️  Git repository already exists in {directory}[/yellow]")
+      return
+    except (git.InvalidGitRepositoryError, git.NoSuchPathError):
+      pass # Good, we can create one
+
+    # Initialize
+    repo = git.Repo.init(directory)
+    console.print(f"[green]✔ Initialized empty Git repository in {repo.working_dir}[/green]")
+    
+  except Exception as e:
+    console.print(f"[bold red]Error: {e}[/bold red]")
+
 def status():
   """Show the git status of the current repository."""
   # to run this command write :

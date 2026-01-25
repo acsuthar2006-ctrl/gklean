@@ -1,9 +1,10 @@
 import typer
 import git
-from .commands import status, save, commit, history, undo, sync, ignore, unignore, rename, changes, review
+from .commands import init, status, save, commit, history, undo, sync, ignore, unignore, rename, changes, review
 
 app = typer.Typer()
 
+app.command()(init)
 app.command()(status)
 app.command()(save)
 app.command()(commit)
