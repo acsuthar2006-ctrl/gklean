@@ -1,6 +1,6 @@
 import typer
 import git
-from .commands import init, status, save, commit, history, undo, sync, ignore, unignore, rename, changes, review
+from .commands import init, status, save, commit, history, undo, sync, ignore, unignore, rename, changes, review, create_branch, delete_branch, switch_branch
 
 app = typer.Typer()
 
@@ -16,6 +16,9 @@ app.command()(unignore)
 app.command()(rename)
 app.command()(changes)
 app.command()(review)
+app.command(name="sprout")(create_branch)
+app.command(name="prune")(delete_branch)
+app.command(name="jump")(switch_branch)
 
 if __name__ == "__main__":
   app()

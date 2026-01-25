@@ -58,18 +58,25 @@ def save(name: str = typer.Argument(default=".")):
   except Exception as e:
     print(f"Error: {e}")
 
+from .safety_feature import check_branch_safety
+
 def commit(message: str):
   """Commit the staged files."""
   # to run this command write :
   #     gklean commit "message"
+  
+  # Safety Check first!
+  if not check_branch_safety():
+    return
+
   try:
     repo = git.Repo(search_parent_directories=True)
     repo.git.commit("-m", message)
-    print(f"Committed: {message}")
+    console.print(f"[green]Committed: {message}[/green]")
   except git.InvalidGitRepositoryError:
-    print("Error: Not a git repository.")
+    console.print("[bold red]Error: Not a git repository.[/bold red]")
   except Exception as e:
-    print(f"Error: {e}")
+    console.print(f"[bold red]Error: {e}[/bold red]")
 
 def history(n: int = typer.Argument(default=10), file: str = typer.Option(None, "--file", "-f"), oneline: bool = typer.Option(False, "--oneline", "-ol")):
   """Show the git history of the current repository."""
