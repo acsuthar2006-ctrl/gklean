@@ -118,28 +118,46 @@ def sync():
   try:
     repo = git.Repo(search_parent_directories=True)
     
-    # helper to check if dirty
-    is_dirty = repo.is_dirty() or len(repo.untracked_files) > 0
-    stashed = False
-    
-    if is_dirty:
-      print(" Uncommitted changes detected. Stashing them...")
-      repo.git.stash("save", "gklean-auto-stash")
-      stashed = True
-      
-    print(" Pulling changes (rebase)...")
-    repo.git.pull("--rebase")
-    
-    if stashed:
-      print(" Popping stash...")
-      try:
-        repo.git.stash("pop")
-      except git.GitCommandError:
-        print("⚠️  Conflict during stash pop. Please resolve conflicts manually.")
+    # Check if remote exists
+    if not repo.remotes:
+        console.print("[yellow]No remote found. Skipping sync (pull/push).[/yellow]")
         return
 
-    print(" Pushing changes...")
-    repo.git.push()
+    # Check tracking
+    active_branch = repo.active_branch
+    tracking_branch = active_branch.tracking_branch()
+    
+    if tracking_branch:
+        # Existing Logic: Full Sync
+        # helper to check if dirty
+        is_dirty = repo.is_dirty() or len(repo.untracked_files) > 0
+        stashed = False
+        
+        if is_dirty:
+          print(" Uncommitted changes detected. Stashing them...")
+          repo.git.stash("save", "gklean-auto-stash")
+          stashed = True
+          
+        print(" Pulling changes (rebase)...")
+        repo.git.pull("--rebase")
+        
+        if stashed:
+          print(" Popping stash...")
+          try:
+            repo.git.stash("pop")
+          except git.GitCommandError:
+            print("⚠️  Conflict during stash pop. Please resolve conflicts manually.")
+            return
+
+        print(" Pushing changes...")
+        repo.git.push()
+        
+    else:
+        # New Branch Logic
+        console.print(f"[yellow]Branch '{active_branch.name}' has no upstream. Skipping pull.[/yellow]")
+        console.print(f" Pushing '{active_branch.name}' to 'origin'...")
+        repo.git.push("--set-upstream", "origin", active_branch.name)
+
     print(" Synced with remote!")
     
   except git.InvalidGitRepositoryError:
