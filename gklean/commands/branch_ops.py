@@ -1,6 +1,8 @@
 import typer
 import git
 from rich.console import Console
+from rich.panel import Panel
+from .branch_meta import BranchMeta, BranchStatus
 
 console = Console()
 
@@ -64,6 +66,15 @@ def switch_branch(name: str):
         # Checkout
         repo.git.checkout(name)
         console.print(f"[green]✔ Jumped to branch: {name}[/green]")
+        
+        # Show Context
+        try:
+             meta = BranchMeta()
+             context = meta.get_context_str(name)
+             if context:
+                 console.print(Panel(context, title="Branch Context", border_style="blue"))
+        except:
+             pass
 
     except git.InvalidGitRepositoryError:
         console.print("[bold red]Error: Not a git repository.[/bold red]")
@@ -75,11 +86,30 @@ def list_branches():
         current = repo.active_branch.name
         
         console.print("[bold]Branches:[/bold]")
+        
+        meta = BranchMeta()
+        
         for head in repo.heads:
+            data = meta.get_branch_data(head.name)
+            
+            # determine icon
+            status_val = data.get("status", "WIP")
+            icon = {
+                "WIP": "🚧",
+                "BLOCKED": "⛔", 
+                "REVIEW": "👀",
+                "SAFE": "✅"
+            }.get(status_val, "❓")
+            
+            # detailed suffix
+            desc = data.get("description", "")
+            if desc:
+                desc = f"[dim]- {desc}[/dim]"
+                
             if head.name == current:
-                console.print(f"  [bold green]* {head.name}[/bold green] (active)")
+                console.print(f"  [bold green]* {icon} {head.name}[/bold green] {desc}")
             else:
-                console.print(f"    {head.name}")
+               console.print(f"    {icon} {head.name} {desc}")
 
     except git.InvalidGitRepositoryError:
         console.print("[bold red]Error: Not a git repository.[/bold red]")
