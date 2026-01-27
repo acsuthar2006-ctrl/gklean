@@ -29,13 +29,54 @@ def init(directory: str = typer.Argument(".", help="Directory to initialize (def
   except Exception as e:
     console.print(f"[bold red]Error: {e}[/bold red]")
 
-def status():
-  """Show the git status of the current repository."""
+from .branch_meta import BranchMeta, BranchStatus
+
+def status(state: str = typer.Argument(None, help="Optional: Set branch status (WIP, BLOCKED, REVIEW, SAFE)"), 
+           msg: str = typer.Argument(None, help="Optional: Description message")):
+  """Show git status OR set branch status (e.g. 'gklean status BLOCKED')."""
   # to run this command write :
   #     gklean status
+  #     gklean status BLOCKED "Waiting for API"
+  
+  if state:
+    # Branch Memory Mode
+    try:
+      meta = BranchMeta()
+      
+      # Normalize input
+      state_upper = state.upper()
+      if state_upper in BranchStatus.__members__:
+         repo = git.Repo(search_parent_directories=True)
+         current = repo.active_branch.name
+         
+         meta.set_status(current, BranchStatus[state_upper])
+         if msg:
+             meta.set_description(current, msg)
+             
+         console.print(f"[green]✔ Status set to {state_upper} for {current}[/green]")
+         if msg:
+             console.print(f"[green]✔ Note saved: {msg}[/green]")
+      else:
+         console.print(f"[red]Invalid status. Options: {', '.join(BranchStatus.__members__.keys())}[/red]")
+         
+    except Exception as e:
+      console.print(f"[red]Error: {e}[/red]")
+    return
+
+  # Git Status Mode (Default)
   try:
     repo = git.Repo(search_parent_directories=True)
     print(repo.git.status())
+    
+    # Show Context if available (Bonus)
+    try:
+        meta = BranchMeta()
+        context_str = meta.get_context_str(repo.active_branch.name)
+        if context_str:
+            print("\n" + context_str)
+    except:
+        pass
+        
   except git.InvalidGitRepositoryError:
     print("Error: Not a git repository.")
   except Exception as e:
