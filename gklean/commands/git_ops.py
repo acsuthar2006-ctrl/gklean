@@ -317,3 +317,55 @@ def review():
   except Exception as e:
     console.print(f"[bold red]Error: {e}[/bold red]")
 
+import os
+
+def reword(commit_id: str = typer.Argument(..., help="Commit ID (hash) to modify"), 
+           new_message: str = typer.Argument(..., help="The new commit message")):
+    """Change the commit message of a specific commit."""
+    # to run this command write:
+    #     gklean reword <commit_id> "new message"
+    try:
+        repo = git.Repo(search_parent_directories=True)
+        
+        try:
+            target = repo.commit(commit_id)
+        except git.BadName:
+            console.print(f"[bold red]Error: Commit '{commit_id}' not found.[/bold red]")
+            return
+
+        # Check if HEAD
+        if repo.head.commit == target:
+            repo.git.commit("--amend", "-m", new_message)
+            console.print(f"[green]✔ Amended HEAD commit message.[/green]")
+            return
+            
+        short_id = target.hexsha[:7]
+        console.print(f"Rewording commit {short_id}...")
+        
+        # We need absolute paths or python -c scripts to avoid path resolution issues
+        seq_editor = f'python3 -c "import sys; data = open(sys.argv[1]).read(); open(sys.argv[1], \\"w\\").write(data.replace(\\"pick {short_id}\\", \\"reword {short_id}\\"))"'
+        msg_editor = f'python3 -c "import sys; open(sys.argv[1], \\"w\\").write(\\"{new_message}\\\\n\\")"'
+        
+        env = os.environ.copy()
+        env["GIT_SEQUENCE_EDITOR"] = seq_editor
+        env["GIT_EDITOR"] = msg_editor
+        
+        parent = target.parents[0] if target.parents else "--root"
+        rebase_target = parent.hexsha if parent != "--root" else "--root"
+        
+        if rebase_target == "--root":
+            repo.git.rebase("-i", "--root", env=env)
+        else:
+            repo.git.rebase("-i", rebase_target, env=env)
+            
+        console.print(f"[green]✔ Successfully reworded commit {short_id}[/green]")
+        
+    except git.InvalidGitRepositoryError:
+        console.print("[bold red]Error: Not a git repository.[/bold red]")
+    except Exception as e:
+        console.print(f"[bold red]Failed to reword commit: {e}[/bold red]")
+        try:
+            repo.git.rebase("--abort")
+            console.print("[yellow]Rebase aborted.[/yellow]")
+        except:
+            pass
