@@ -42,6 +42,7 @@ Manage branches and context without losing your mind.
 - **`gklean commit "msg"`**: Safely commit your changes.
 - **`gklean history`**: View recent commits with ease.
 - **`gklean undo`**: Soft resets the last commit (keeps your work, just undoes the commit).
+- **`gklean reword <commit_id> "new message"`**: Change the commit message for a specific commit.
 - **`gklean ignore <file>`**: Easily add files to `.gitignore` without opening it.
 - **`gklean unignore <file>`**: Remove files from `.gitignore`.
 - **`gklean rename <name>`**: Rename the CLI command itself!
@@ -60,6 +61,9 @@ gklean review
 
 # Save valid changes
 gklean commit "feat: my new cool feature"
+
+# Fix a commit message
+gklean reword <commit_id> "better message"
 ```
 
 ## 🛠️ Installation
